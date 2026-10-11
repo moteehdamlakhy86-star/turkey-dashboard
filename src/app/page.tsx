@@ -1,69 +1,89 @@
-import Image from "next/image";
+'use client';
+import { useState, useMemo, useCallback } from 'react';
+import { places } from '@/lib/data';
+import { Place, ViewMode } from '@/types';
+import { StatsCards } from '@/components/dashboard/StatsCards';
+import { SearchBar } from '@/components/dashboard/SearchBar';
+import { FilterPanel } from '@/components/dashboard/FilterPanel';
+import { PlacesGrid } from '@/components/dashboard/PlacesGrid';
+import { PlacesTable } from '@/components/dashboard/PlacesTable';
+import { Charts } from '@/components/dashboard/Charts';
+import { DetailModal } from '@/components/dashboard/DetailModal';
+import { LayoutGrid, Table, BarChart3 } from 'lucide-react';
 
-export default function Home() {
+export default function HomePage() {
+  const [search, setSearch] = useState('');
+  const [selectedRegion, setSelectedRegion] = useState('');
+  const [selectedWilaya, setSelectedWilaya] = useState('');
+  const [selectedLevel, setSelectedLevel] = useState('');
+  const [viewMode, setViewMode] = useState<ViewMode>('cards');
+  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
+
+  const filteredPlaces = useMemo(() => {
+    return places.filter(p => {
+      if (selectedRegion && p.region !== selectedRegion) return false;
+      if (selectedWilaya && p.wilaya !== selectedWilaya) return false;
+      if (selectedLevel && p.level !== selectedLevel) return false;
+      if (search) {
+        const q = search.toLowerCase();
+        const hay = [p.wilaya, p.region, p.qada, p.baladiya, p.fame, p.landmark, p.taste, p.product, p.economy, p.nature, p.climate, p.scope].join(' ').toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      return true;
+    });
+  }, [search, selectedRegion, selectedWilaya, selectedLevel]);
+
+  const handleReset = useCallback(() => { setSearch(''); setSelectedRegion(''); setSelectedWilaya(''); setSelectedLevel(''); }, []);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <div className="min-h-screen bg-slate-950 text-white p-6">
+      <div className="container mx-auto max-w-7xl">
+        <header className="text-center mb-10">
+          <h1 className="text-5xl md:text-6xl font-black bg-gradient-to-r from-red-500 via-amber-500 to-teal-500 bg-clip-text text-transparent mb-3">
+            🇷 دليل تركيا المحلّي
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+          <p className="text-gray-400 text-lg">اكتشف الولايات والأقضية والبلديات بشكل تفاعلي</p>
+        </header>
+
+        <section className="mb-8"><StatsCards data={places} filtered={filteredPlaces} /></section>
+        <section className="mb-6"><SearchBar value={search} onChange={setSearch} /></section>
+        <section className="mb-6">
+          <FilterPanel
+            selectedRegion={selectedRegion} selectedWilaya={selectedWilaya} selectedLevel={selectedLevel}
+            onRegionChange={setSelectedRegion} onWilayaChange={setSelectedWilaya} onLevelChange={setSelectedLevel}
+            onReset={handleReset}
+          />
+        </section>
+
+        <section className="mb-6 flex items-center justify-center gap-2 flex-wrap">
+          {[
+            { mode: 'cards' as ViewMode, icon: LayoutGrid, label: 'بطاقات' },
+            { mode: 'table' as ViewMode, icon: Table, label: 'جدول' },
+            { mode: 'charts' as ViewMode, icon: BarChart3, label: 'تحليلات' },
+          ].map(({ mode, icon: Icon, label }) => (
+            <button key={mode} onClick={() => setViewMode(mode)} className={`px-5 py-3 rounded-xl font-bold transition-all flex items-center gap-2 ${viewMode === mode ? 'bg-red-500 text-white shadow-lg shadow-red-500/30' : 'border border-white/10 bg-white/5 hover:bg-white/10 text-white'}`}>
+              <Icon className="w-4 h-4" />{label}
+            </button>
+          ))}
+        </section>
+
+        <section className="mb-6 text-center text-gray-400">
+          عرض <span className="text-red-500 font-bold">{filteredPlaces.length}</span> من <span className="text-red-500 font-bold">{places.length}</span> سجل
+        </section>
+
+        <section>
+          {viewMode === 'cards' && <PlacesGrid places={filteredPlaces} onPlaceClick={setSelectedPlace} />}
+          {viewMode === 'table' && <PlacesTable places={filteredPlaces} onPlaceClick={setSelectedPlace} />}
+          {viewMode === 'charts' && <Charts places={filteredPlaces} />}
+        </section>
+
+        <footer className="mt-16 text-center text-gray-400 border-t border-white/10 pt-8">
+          <p className="text-lg font-bold mb-2">🇹🇷 دليل تركيا المحلّي 2026</p>
+          <p className="text-sm">البيانات مستخرجة من مصادر رسمية • تحليلات ذكية</p>
+        </footer>
+
+        <DetailModal place={selectedPlace} onClose={() => setSelectedPlace(null)} />
+      </div>
     </div>
   );
 }
