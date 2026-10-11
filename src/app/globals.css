@@ -6,8 +6,24 @@ body {
   background: #0a0e1a;
   color: #e8e8e8;
   font-family: 'Tajawal', system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
 }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #0a0e1a; }
-::-webkit-scrollbar-thumb { background: #e63946; border-radius: 3px; }
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0e1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e63946;
+  border-radius: 3px;
+}
