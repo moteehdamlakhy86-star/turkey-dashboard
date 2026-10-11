@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: '🇹🇷 دليل تركيا المحلّي 2026',
+  title: 'دليل تركيا المحلّي 2026',
   description: 'داشبورد تفاعلي احترافي',
 };
 
