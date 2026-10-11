@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'دليل تركيا',
-  description: 'داشبورد',
+  title: 'دليل تركيا المحلّي 2026',
+  description: 'داشبورد تفاعلي احترافي',
 };
 
 export default function RootLayout({
@@ -12,7 +13,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ar" dir="rtl">
-      <body>{children}</body>
+      <head>
+        <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet" />
+      </head>
+      <body className="min-h-screen antialiased">{children}</body>
     </html>
   );
 }
